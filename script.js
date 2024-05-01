@@ -141,20 +141,56 @@ addressInput.addEventListener("input", function(event){
     }
 })
 
+
+// Finalizar Pedido
 checkoutBtn.addEventListener("click", function(){
+
+    const isOpen = checkRestauranteOpen();
+    if(!isOpen){
+        Toastify({
+        text: "Ops o restaurante está fechado!",
+        duration: 3000,
+        close: true,
+        gravity: "top", // `top` or `bottom`
+        position: "right", // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+          background: "#ef4444",
+            },
+        }).showToast();
+
+        return;
+    }
+
     if(cart.length === 0) return;
     if(addressInput.value === ""){
         addressWarn.classList.remove("hidden")
         addressInput.classList.add("border-red-500")
         return;
     }
+
+    // Enviar o pedido para o api whats
+
+    const cartItems = cart.map((item) => {
+        return(
+            ` ${item.name} Quantidade: (${item.quantity}) Preço: R$${item.price} |`
+        )
+    }).join("")
+
+    const message = encodeURIComponent(cartItems)
+    const phone = "351910598989"
+
+    window.open(`https://wa.me/${phone}?text=${message} Endereço: ${addressInput.value}` , "_blank")
+
+    cart = [];
+    updateCartModal();
 })
 
 // Verificar a hora e manipular o card horário
 function checkRestauranteOpen(){
     const data = new Date();
     const hora = data.getHours();
-    return hora >= 18 && hora < 22; //true
+    return hora >= 20 && hora < 22; //true
 }
 
 const spanItem = document.getElementById("date-span")
